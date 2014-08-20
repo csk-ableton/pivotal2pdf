@@ -14,9 +14,13 @@ type_to_icon_map = {
 
 class PivotalStory(object):
 
-    def __init__(self, id, title, description, estimate, labels, type, *a, **k):
+    def __init__(self, number, id,
+                 title, description,
+                 estimate, labels, type,
+                 *a, **k):
         super(PivotalStory, self).__init__(*a, **k)
 
+        self.number = number
         self.id = id
         self.title = title
         self.description = description
@@ -24,8 +28,9 @@ class PivotalStory(object):
         self.labels = labels
         self.type = type
 
-    def draw(self, pdf, x, y, width, height):
+    def draw(self, pdf, x, y, width, height, show_number=False):
         pdf.set_font('Helvetica')
+        pdf.set_text_color(0, 0, 0)
         pdf.set_line_width(0.3)
         pdf.rect(x, y, width, height)
 
@@ -54,9 +59,15 @@ class PivotalStory(object):
         pdf.set_font_size(10)
         pdf.text(x+4, y+height-4, self.labels)
 
+        if show_number:
+            pdf.set_font_size(8)
+            pdf.set_text_color(150, 150, 150)
+            pdf.text(x+width-3, y+height-2, str(self.number))
 
-def make_pivotal_story(column_names, data):
+
+def make_pivotal_story(column_names, (number, data)):
     return PivotalStory(
+        number=number,
         id=data[column_names.index('Id')],
         title=data[column_names.index('Title')],
         description=data[column_names.index('Description')],
@@ -70,11 +81,15 @@ def main():
         description='Create a pdf document from a exported csv of Pivotal Tracker',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    arg_parser.add_argument('csv', help='the file path to the csv file')
+    arg_parser.add_argument('csv',
+        help='the file path to the csv file')
     arg_parser.add_argument('-m', '--margin', type=int, default=5,
         help='margin of the page in mm')
     arg_parser.add_argument('-o', '--output', default='stories.pdf',
         help='file path to the generated pdf')
+    arg_parser.add_argument('-n', '--show-number', action='store_true',
+        help='shows the story number on the bottom left')
+
 
     args = arg_parser.parse_args()
 
@@ -86,7 +101,8 @@ def main():
     with open(args.csv, 'rb') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         data = list(reader)
-        stories = map(partial(make_pivotal_story, data[0]), data[1:])
+        stories = map(partial(make_pivotal_story, data[0]),
+                      enumerate(data[1:], 1))
 
     pdf = Pdf()
     pdf.set_auto_page_break(False)
@@ -100,7 +116,10 @@ def main():
     for story_chunk in chunks(stories, 4):
         pdf.add_page('Landscape')
         for story, position in zip(story_chunk, positions):
-            story.draw(pdf, position[0], position[1], story_width, story_height)
+            story.draw(pdf,
+                position[0], position[1],
+                story_width, story_height,
+                args.show_number)
 
     pdf.output(args.output)
 
