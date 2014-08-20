@@ -46,13 +46,14 @@ class PivotalStory(object):
         pdf.multi_cell(width, 4)
 
         pdf.set_x(x+2)
+        pdf.set_font('Helvetica', 'B', 18)
         pdf.set_font_size(18)
         pdf.multi_cell(width-4, 8, self.title, align='L')
 
         pdf.multi_cell(width, 4)
 
         pdf.set_x(x+2)
-        pdf.set_font_size(12)
+        pdf.set_font('Helvetica', '', 12)
         with pdf.clipping_rect(x+2, y, width-4, height-14):
             pdf.multi_cell(width-4, 6, self.description)
 
