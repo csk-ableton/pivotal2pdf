@@ -16,11 +16,50 @@ type_to_icon_map = {
 }
 
 
+class PivotalTask(object):
+
+    def __init__(self, description, story, *a, **k):
+        super(PivotalTask, self).__init__(*a, **k)
+
+        self.description = description
+        self.story = story
+
+    def draw(self, pdf, x, y, width, height, show_number=False):
+        pdf.set_line_width(0.3)
+        pdf.rect(x, y, width, height)
+
+        pdf.set_xy(x+2, y+2)
+        pdf.set_font('Helvetica', '', 18)
+        pdf.set_text_color(0, 0, 0)
+        with pdf.clipping_rect(x, y, width, height-10):
+            pdf.multi_cell(width-4, 8, self.description, align='L')
+
+        pdf.set_font_size(10)
+        pdf.set_text_color(150, 150, 150)
+        pdf.text(x+4, y+height-4, '#' + self.story.id)
+
+
+class PivotalTaskPair(object):
+
+    def __init__(self, pair, *a, **k):
+        super(PivotalTaskPair, self).__init__(*a, **k)
+
+        self.first = pair[0]
+        self.second = pair[1] if len(pair) > 1 else None
+
+    def draw(self, pdf, x, y, width, height, show_number=False):
+        self.first.draw(pdf, x, y, width, height/2)
+
+        if self.second:
+            self.second.draw(pdf, x, y+height/2, width, height/2)
+
+
 class PivotalStory(object):
 
     def __init__(self, number, id,
                  title, description,
                  estimate, labels, type,
+                 tasks,
                  *a, **k):
         super(PivotalStory, self).__init__(*a, **k)
 
@@ -32,6 +71,7 @@ class PivotalStory(object):
         self.labels = labels
         is_spike = 'spike' in labels.split(', ')
         self.type = 'spike' if is_spike else type
+        self.tasks = [PivotalTask(t, self) for t in tasks]
 
     def draw(self, pdf, x, y, width, height, show_number=False):
         pdf.set_font('Helvetica')
@@ -54,7 +94,6 @@ class PivotalStory(object):
 
         pdf.set_x(x+2)
         pdf.set_font('Helvetica', 'B', 18)
-        pdf.set_font_size(18)
         pdf.multi_cell(width-4, 8, self.title, align='L')
 
         pdf.multi_cell(width, 4)
@@ -74,6 +113,8 @@ class PivotalStory(object):
 
 
 def make_pivotal_story(column_names, (number, data)):
+    task_indices = [i for i, name in enumerate(column_names) if name == 'Task']
+    tasks = [data[i] for i in task_indices if i < len(data)]
     return PivotalStory(
         number=number,
         id=data[column_names.index('Id')],
@@ -81,7 +122,16 @@ def make_pivotal_story(column_names, (number, data)):
         description=data[column_names.index('Description')],
         estimate=data[column_names.index('Estimate')],
         labels = data[column_names.index('Labels')],
-        type=data[column_names.index('Type')])
+        type=data[column_names.index('Type')],
+        tasks=tasks)
+
+
+def iterstories(stories, include_tasks=False):
+    for s in stories:
+        yield s
+        if include_tasks:
+            for t in chunks(s.tasks, 2):
+                yield PivotalTaskPair(t)
 
 
 def main():
@@ -97,6 +147,8 @@ def main():
         help='file path to the generated pdf')
     arg_parser.add_argument('-n', '--show-number', action='store_true',
         help='shows the story number on the bottom left')
+    arg_parser.add_argument('-t', '--show-tasks', action='store_true',
+        help='shows the tasks for each story')
     arg_parser.add_argument('-c', '--collate', action='store_true',
         help='collate stories for easier sorting after cutting all pages')
 
@@ -124,6 +176,7 @@ def main():
         (page_margin,             page_margin+story_height),
         (page_margin+story_width, page_margin+story_height)]
 
+    stories = list(iterstories(stories, include_tasks=args.show_tasks))
     chunk_function = stacked_chunks if args.collate else chunks
     for story_chunk in chunk_function(stories, 4):
         pdf.add_page('Landscape')
