@@ -11,6 +11,7 @@ type_to_icon_map = {
     'chore': 'icons/chore.png',
     'bug': 'icons/bug.png',
     'feature': 'icons/feature.png',
+    'spike': 'icons/spike.png',
     'release': 'icons/release.png'
 }
 
@@ -29,7 +30,8 @@ class PivotalStory(object):
         self.description = description
         self.estimate = estimate
         self.labels = labels
-        self.type = type
+        is_spike = 'spike' in labels.split(', ')
+        self.type = 'spike' if is_spike else type
 
     def draw(self, pdf, x, y, width, height, show_number=False):
         pdf.set_font('Helvetica')
