@@ -2,7 +2,7 @@ from functools import partial
 import argparse
 from pdf import Pdf
 import csv
-from util import chunks
+from util import chunks, stacked_chunks
 
 
 type_to_icon_map = {
@@ -92,7 +92,8 @@ def main():
         help='file path to the generated pdf')
     arg_parser.add_argument('-n', '--show-number', action='store_true',
         help='shows the story number on the bottom left')
-
+    arg_parser.add_argument('-c', '--collate', action='store_true',
+        help='collate stories for easier sorting after cutting all pages')
 
     args = arg_parser.parse_args()
 
@@ -116,7 +117,8 @@ def main():
         (page_margin,             page_margin+story_height),
         (page_margin+story_width, page_margin+story_height)]
 
-    for story_chunk in chunks(stories, 4):
+    chunk_function = stacked_chunks if args.collate else chunks
+    for story_chunk in chunk_function(stories, 4):
         pdf.add_page('Landscape')
         for story, position in zip(story_chunk, positions):
             story.draw(pdf,
