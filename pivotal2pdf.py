@@ -1,7 +1,9 @@
 from functools import partial
 import argparse
-from pdf import Pdf
 import csv
+import os
+
+from pdf import Pdf
 from util import chunks, stacked_chunks
 
 
@@ -89,7 +91,7 @@ def main():
         help='the file path to the csv file')
     arg_parser.add_argument('-m', '--margin', type=int, default=5,
         help='margin of the page in mm')
-    arg_parser.add_argument('-o', '--output', default='stories.pdf',
+    arg_parser.add_argument('-o', '--output',
         help='file path to the generated pdf')
     arg_parser.add_argument('-n', '--show-number', action='store_true',
         help='shows the story number on the bottom left')
@@ -98,6 +100,8 @@ def main():
 
     args = arg_parser.parse_args()
 
+    output_file = args.output if args.output is not None \
+        else os.path.splitext(args.csv)[0] + '.pdf'
     page_margin = args.margin
     story_width = (297 - (page_margin*2)) / 2
     story_height = (210 - (page_margin*2)) / 2
@@ -127,7 +131,7 @@ def main():
                 story_width, story_height,
                 args.show_number)
 
-    pdf.output(args.output)
+    pdf.output(output_file)
 
 if __name__ == "__main__":
     main()
