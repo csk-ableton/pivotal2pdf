@@ -8,7 +8,8 @@ from util import chunks, stacked_chunks
 type_to_icon_map = {
     'chore': 'icons/chore.png',
     'bug': 'icons/bug.png',
-    'feature': 'icons/feature.png'
+    'feature': 'icons/feature.png',
+    'release': 'icons/release.png'
 }
 
 
