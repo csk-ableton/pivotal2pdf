@@ -65,7 +65,7 @@ class PivotalStory(object):
         if show_number:
             pdf.set_font_size(8)
             pdf.set_text_color(150, 150, 150)
-            pdf.text(x+width-3, y+height-2, str(self.number))
+            pdf.text(x+width-4, y+height-2, str(self.number))
 
 
 def make_pivotal_story(column_names, (number, data)):
