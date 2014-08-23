@@ -34,7 +34,9 @@ class PivotalStory(object):
         pdf.set_line_width(0.3)
         pdf.rect(x, y, width, height)
 
-        pdf.image(type_to_icon_map[self.type], x+width-12, y+height-12, 8, 8)
+        icon = type_to_icon_map.get(self.type, None)
+        if icon is not None:
+            pdf.image(icon, x+width-12, y+height-12, 8, 8)
 
         pdf.set_xy(x+2, y+2)
         pdf.set_font_size(12)
