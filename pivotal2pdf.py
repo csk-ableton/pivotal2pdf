@@ -112,7 +112,8 @@ class PivotalStory(object):
             pdf.text(x+width-4, y+height-2, str(self.number))
 
 
-def make_pivotal_story(column_names, (number, data)):
+def make_pivotal_story(column_names, number_data):
+    number, data = number_data
     task_indices = [i for i, name in enumerate(column_names) if name == 'Task']
     tasks = [data[i] for i in task_indices if i < len(data)]
     return PivotalStory(
