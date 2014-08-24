@@ -126,7 +126,6 @@ def make_pivotal_story(column_names, number_data):
         type=data[column_names.index('Type')],
         tasks=tasks)
 
-
 def iterstories(stories, include_tasks=False):
     for s in stories:
         yield s
@@ -162,7 +161,7 @@ def main():
     story_height = (210 - (page_margin*2)) / 2
     stories = []
 
-    with open(args.csv, 'rb') as csvfile:
+    with open(args.csv, 'r') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         data = list(reader)
         stories = map(partial(make_pivotal_story, data[0]),
@@ -188,6 +187,8 @@ def main():
                 args.show_number)
 
     pdf.output(output_file)
+
+    return output_file
 
 if __name__ == "__main__":
     main()
