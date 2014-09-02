@@ -81,7 +81,9 @@ class PivotalStory(object):
 
         icon = type_to_icon_map.get(self.type, None)
         if icon is not None:
-            pdf.image(icon, x+width-12, y+height-12, 8, 8)
+            root_dir = os.path.dirname(os.path.abspath(__file__))
+            icon_path = os.path.join(root_dir, icon)
+            pdf.image(icon_path, x+width-12, y+height-12, 8, 8)
 
         pdf.set_xy(x+2, y+2)
         pdf.set_font_size(12)
