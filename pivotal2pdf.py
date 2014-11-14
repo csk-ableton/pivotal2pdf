@@ -112,18 +112,22 @@ class PivotalStory(object):
             pdf.text(x+width-4, y+height-2, str(self.number))
 
 
+def get_data_from_column_index(data, column_names, column_title):
+    return "" if column_title not in column_names \
+        else data[column_names.index(column_title)]
+
 def make_pivotal_story(column_names, number_data):
     number, data = number_data
     task_indices = [i for i, name in enumerate(column_names) if name == 'Task']
     tasks = [data[i] for i in task_indices if i < len(data)]
     return PivotalStory(
         number=number,
-        id=data[column_names.index('Id')],
-        title=data[column_names.index('Title')],
-        description=data[column_names.index('Description')],
-        estimate=data[column_names.index('Estimate')],
-        labels = data[column_names.index('Labels')],
-        type=data[column_names.index('Type')],
+        id=get_data_from_column_index(data, column_names,'Id'),
+        title=get_data_from_column_index(data, column_names,'Title'),
+        description=get_data_from_column_index(data, column_names,'Description'),
+        estimate=get_data_from_column_index(data, column_names,'Estimate'),
+        labels = get_data_from_column_index(data, column_names,'Labels'),
+        type=get_data_from_column_index(data, column_names,'Type'),
         tasks=tasks)
 
 def iterstories(stories, include_tasks=False):
