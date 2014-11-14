@@ -114,19 +114,31 @@ class PivotalStory(object):
             pdf.text(x+width-4, y+height-2, str(self.number))
 
 
+def get_data_from_column_index(data, column_names, column_title):
+    return "" if column_title not in column_names \
+        else data[column_names.index(column_title)]
+
 def make_pivotal_story(column_names, number_data):
     number, data = number_data
     task_indices = [i for i, name in enumerate(column_names) if name == 'Task']
     tasks = [data[i] for i in task_indices if i < len(data)]
     return PivotalStory(
         number=number,
-        id=data[column_names.index('Id')],
-        title=data[column_names.index('Title')],
-        description=data[column_names.index('Description')],
-        estimate=data[column_names.index('Estimate')],
-        labels = data[column_names.index('Labels')],
-        type=data[column_names.index('Type')],
+        id=get_data_from_column_index(data, column_names,'Id'),
+        title=get_data_from_column_index(data, column_names,'Title'),
+        description=get_data_from_column_index(data, column_names,'Description'),
+        estimate=get_data_from_column_index(data, column_names,'Estimate'),
+        labels=get_data_from_column_index(data, column_names,'Labels'),
+        type=get_data_from_column_index(data, column_names,'Type'),
         tasks=tasks)
+
+def validate_columns(column_names):
+    requried_columns = set(('Id', 'Title', 'Description', 'Estimate', 'Labels', 'Type'))
+    column_names = set(column_names)
+    if not requried_columns.issubset(column_names):
+        raise RuntimeError(
+            "Missing columns: %s" % requried_columns.difference(column_names)
+        )
 
 def iterstories(stories, include_tasks=False):
     for s in stories:
@@ -153,6 +165,8 @@ def main():
         help='shows the tasks for each story')
     arg_parser.add_argument('-c', '--collate', action='store_true',
         help='collate stories for easier sorting after cutting all pages')
+    arg_parser.add_argument('-s', '--strict', action='store_true',
+        help='fails if the csv file does not contain all required columns')
 
     args = arg_parser.parse_args()
 
@@ -166,6 +180,8 @@ def main():
     with open(args.csv, 'r') as csvfile:
         reader = csv.reader(csvfile, delimiter=',')
         data = list(reader)
+        if args.strict:
+            validate_columns(data[0])
         stories = map(partial(make_pivotal_story, data[0]),
                       enumerate(data[1:], 1))
 
