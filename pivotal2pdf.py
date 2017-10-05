@@ -4,6 +4,8 @@ from functools import partial
 import argparse
 import csv
 import os
+import subprocess
+import sys
 
 from pdf import Pdf
 from util import chunks, stacked_chunks
@@ -154,6 +156,15 @@ def iterstories(stories, include_tasks=False):
                 yield PivotalTaskPair(t)
 
 
+def open_file(filename):
+    if sys.platform.startswith('darwin'):
+        subprocess.call(('open', filename))
+    elif os.name == 'nt':
+        os.startfile(filename)
+    elif os.name == 'posix':
+        subprocess.call(('xdg-open', filename))
+
+
 def main():
     arg_parser = argparse.ArgumentParser(
         description='Create a pdf document from a exported csv of Pivotal Tracker',
@@ -220,6 +231,8 @@ def main():
             )
 
     pdf.output(output_file)
+
+    open_file(output_file)
 
     return output_file
 
