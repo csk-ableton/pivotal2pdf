@@ -6,7 +6,7 @@ Create a pdf document from an exported csv of Pivotal Tracker
 ## Requirements
 
 * Python (tested with 2.7 and 3.4)
-* pyfpdf (https://code.google.com/p/pyfpdf/)
+* pyfpdf (https://github.com/reingart/pyfpdf)
 * Optional: Qt5 and PyQt5
 
 ## How it works
