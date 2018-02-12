@@ -7,8 +7,8 @@ import os
 import subprocess
 import sys
 
-from pdf import Pdf
-from util import chunks, stacked_chunks
+from .pdf import Pdf
+from .util import chunks, stacked_chunks
 
 
 type_to_icon_map = {

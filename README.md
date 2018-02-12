@@ -3,11 +3,11 @@ pivotal2pdf
 
 Create a pdf document from an exported csv of Pivotal Tracker
 
-## Requirements
+## Setup
 
-* Python (tested with 2.7 and 3.4)
-* pyfpdf (https://github.com/reingart/pyfpdf)
-* Optional: Qt5 and PyQt5
+```
+pip install pivotal2pdf
+```
 
 ## How it works
 
@@ -15,16 +15,12 @@ Select your stories from Pivotal Tracker. Export them to a csv file.
 Run the Python script to convert them into a pdf. The stories will be split into chunks
 of 4 per page.
 
-`python pivotal2pdf.py yourproject_20140820_1036.csv`
-
-Or if you like to use a graphical version use
-
-`python pivotal2pdf-gui.py yourproject_20140820_1036.csv`
+`pivotal2pdf yourproject_20140820_1036.csv`
 
 ## Usage
 
 ```
-pivotal2pdf.py [-h] [-m MARGIN] [-o OUTPUT] [-n] [-t] [-c] csv
+pivotal2pdf [-h] [-m MARGIN] [-o OUTPUT] [-n] [-t] [-c] csv
 
 positional arguments:
   csv                   the file path to the csv file
