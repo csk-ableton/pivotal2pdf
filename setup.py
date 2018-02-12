@@ -8,6 +8,7 @@ setup(
     description="A utility to generate PDFs from CSV exported from Pivotal",
     packages=["pivotal2pdf"],
     install_requires=['fpdf'],
+    include_package_data=True,
     entry_points={
         'console_scripts': [
             'pivotal2pdf = pivotal2pdf:main',
